@@ -1,7 +1,10 @@
 package com.ap.stockmarketanalytics.restclient.alphavantage;
 
+import com.ap.stockmarketanalytics.model.Quote;
+import com.ap.stockmarketanalytics.model.QuoteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -16,24 +19,36 @@ public class AlphaVantageWebClient {
     @Value("${stock-market-analytics.alpha-vantage.apiKey}")
     private String apiKey;
 
-    private static final String ALPHA_VANTAGE_BASE_URL = "http://xyz";
+    private static final String ALPHA_VANTAGE_BASE_URL = "https://www.alphavantage.co/";
 
     public AlphaVantageWebClient(WebClient.Builder webClient) {
-        this.webClient = webClient.build();
+        this.webClient =
+                webClient
+                        .baseUrl(ALPHA_VANTAGE_BASE_URL)
+                        .codecs(configurer ->
+                                        configurer
+                                                .defaultCodecs()
+                                                .jackson2JsonDecoder(new Jackson2JsonDecoder()))
+                        .build();
     }
 
-    public Mono<String> getStockPrice(String tickerId) {
+    public Mono<Quote> getStockPrice(String tickerId) {
 
 
         log.info("heartbeat!!");
 
         return webClient
                 .get()
-                .uri("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=demo")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/query/")
+                        .queryParam("function", "GLOBAL_QUOTE")
+                        .queryParam("symbol", tickerId)
+                        .queryParam("apikey", apiKey)
+                        .build())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(QuoteResponse.class)
+                .map(QuoteResponse::getGlobalQuote);
     }
-
 
 
 }

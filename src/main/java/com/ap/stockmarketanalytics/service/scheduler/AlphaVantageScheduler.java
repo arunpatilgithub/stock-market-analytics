@@ -24,7 +24,7 @@ public class AlphaVantageScheduler {
     @Scheduled(fixedRate = 3000)
     public void publishStockPrice() {
 
-        alphaVantageWebClient.getStockPrice("IBM").log();
+        alphaVantageWebClient.getStockPrice("AMZN").subscribe(q -> System.out.println(q));
 
     }
 

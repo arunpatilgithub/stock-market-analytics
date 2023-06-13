@@ -1,5 +1,6 @@
 package com.ap.stockmarketanalytics.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,24 +8,49 @@ import lombok.Setter;
 @Setter
 public class Quote {
 
+    @JsonProperty("01. symbol")
     private String symbol;
 
-    private double open;
+    @JsonProperty("02. open")
+    private String open;
 
-    private double high;
+    @JsonProperty("03. high")
+    private String high;
 
-    private double low;
+    @JsonProperty("04. low")
+    private String low;
 
-    private double price;
+    @JsonProperty("05. price")
+    private String price;
 
-    private double volume;
+    @JsonProperty("06. volume")
+    private String volume;
 
+    @JsonProperty("07. latest trading day")
     private String latestTradingDay;
 
-    private double previousClose;
+    @JsonProperty("08. previous close")
+    private String previousClose;
 
-    private double change;
+    @JsonProperty("09. change")
+    private String change;
 
-    private double changePercent;
+    @JsonProperty("10. change percent")
+    private String changePercent;
 
+    @Override
+    public String toString() {
+        return "Quote{" +
+                "symbol='" + symbol + '\'' +
+                ", open='" + open + '\'' +
+                ", high='" + high + '\'' +
+                ", low='" + low + '\'' +
+                ", price='" + price + '\'' +
+                ", volume='" + volume + '\'' +
+                ", latestTradingDay='" + latestTradingDay + '\'' +
+                ", previousClose='" + previousClose + '\'' +
+                ", change='" + change + '\'' +
+                ", changePercent='" + changePercent + '\'' +
+                '}';
+    }
 }
