@@ -1,0 +1,7 @@
+stock-market-analytics:
+  alpha-vantage:
+    apiKey: ${ALPHA_VANTAGE_API_KEY}
+
+logging:
+  level:
+    root: info
