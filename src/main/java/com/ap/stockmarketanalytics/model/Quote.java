@@ -12,28 +12,28 @@ public class Quote {
     private String symbol;
 
     @JsonProperty("02. open")
-    private String open;
+    private double open;
 
     @JsonProperty("03. high")
-    private String high;
+    private double high;
 
     @JsonProperty("04. low")
-    private String low;
+    private double low;
 
     @JsonProperty("05. price")
-    private String price;
+    private double price;
 
     @JsonProperty("06. volume")
-    private String volume;
+    private long volume;
 
     @JsonProperty("07. latest trading day")
     private String latestTradingDay;
 
     @JsonProperty("08. previous close")
-    private String previousClose;
+    private double previousClose;
 
     @JsonProperty("09. change")
-    private String change;
+    private double change;
 
     @JsonProperty("10. change percent")
     private String changePercent;
@@ -42,14 +42,14 @@ public class Quote {
     public String toString() {
         return "Quote{" +
                 "symbol='" + symbol + '\'' +
-                ", open='" + open + '\'' +
-                ", high='" + high + '\'' +
-                ", low='" + low + '\'' +
-                ", price='" + price + '\'' +
-                ", volume='" + volume + '\'' +
+                ", open=" + open +
+                ", high=" + high +
+                ", low=" + low +
+                ", price=" + price +
+                ", volume=" + volume +
                 ", latestTradingDay='" + latestTradingDay + '\'' +
-                ", previousClose='" + previousClose + '\'' +
-                ", change='" + change + '\'' +
+                ", previousClose=" + previousClose +
+                ", change=" + change +
                 ", changePercent='" + changePercent + '\'' +
                 '}';
     }

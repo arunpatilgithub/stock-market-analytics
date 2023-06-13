@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.0'
 	id 'io.spring.dependency-management' version '1.1.0'
-	id "com.github.davidmc24.gradle.plugin.avro" version "1.6.0"
+	id 'com.github.davidmc24.gradle.plugin.avro' version '1.6.0'
 }
 
 group = 'com.ap'
@@ -19,14 +19,24 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	implementation 'io.confluent:kafka-avro-serializer:7.3.1'
+	implementation 'io.confluent:kafka-avro-serializer:7.4.0'
+	implementation 'io.confluent:kafka-schema-registry-client:7.4.0'
 
 	compileOnly 'org.projectlombok:lombok:1.18.28'
 	annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
 	testCompileOnly 'org.projectlombok:lombok:1.18.28'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
 
+}
+
+avro {
+	createSetters = false
+	stringType = 'String'
+	enableDecimalLogicalType = true
 }
 
 tasks.named('test') {

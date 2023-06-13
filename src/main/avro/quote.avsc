@@ -1,0 +1,17 @@
+{
+  "type": "record",
+  "name": "StockQuote",
+  "namespace": "com.ap.stockmarketanalytics.model",
+  "fields": [
+    {"name": "symbol", "type": "string"},
+    {"name": "open", "type": "double"},
+    {"name": "high", "type": "double"},
+    {"name": "low", "type": "double"},
+    {"name": "price", "type": "double"},
+    {"name": "volume", "type": "long"},
+    {"name": "latestTradingDay", "type": "string"},
+    {"name": "previousClose", "type": "double"},
+    {"name": "change", "type": "double"},
+    {"name": "changePercent", "type": "string"}
+  ]
+}

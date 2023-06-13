@@ -1,5 +1,6 @@
 package com.ap.stockmarketanalytics.restclient.alphavantage;
 
+import com.ap.stockmarketanalytics.model.CompanyOverview;
 import com.ap.stockmarketanalytics.model.Quote;
 import com.ap.stockmarketanalytics.model.QuoteResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +35,6 @@ public class AlphaVantageWebClient {
 
     public Mono<Quote> getStockPrice(String tickerId) {
 
-
-        log.info("heartbeat!!");
-
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -48,6 +46,20 @@ public class AlphaVantageWebClient {
                 .retrieve()
                 .bodyToMono(QuoteResponse.class)
                 .map(QuoteResponse::getGlobalQuote);
+    }
+
+    public Mono<CompanyOverview> getCompanyOverview(String tickerId) {
+
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/query/")
+                        .queryParam("function", "OVERVIEW")
+                        .queryParam("symbol", tickerId)
+                        .queryParam("apikey", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(CompanyOverview.class);
     }
 
 
