@@ -4,7 +4,9 @@ package com.ap.stockmarketanalytics.service.scheduler;
 import com.ap.stockmarketanalytics.config.kafka.KafkaConfig;
 import com.ap.stockmarketanalytics.model.CompanyOverview;
 import com.ap.stockmarketanalytics.model.StockQuote;
+import com.ap.stockmarketanalytics.model.TimeSeriesDailyQuote;
 import com.ap.stockmarketanalytics.model.mapper.QuoteObjectMapper;
+import com.ap.stockmarketanalytics.model.mapper.TimeSeriesMapper;
 import com.ap.stockmarketanalytics.restclient.alphavantage.AlphaVantageWebClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -19,20 +21,24 @@ public class AlphaVantageScheduler {
     private final KafkaConfig kafkaConfig;
     private final AlphaVantageWebClient alphaVantageWebClient;
     private final QuoteObjectMapper quoteObjectMapper;
+    private final TimeSeriesMapper timeSeriesMapper;
 
     private final String QUOTE_TOPIC = "TICKER_QUOTE";
+    private final String TIME_SERIES_DAILY_TOPIC = "TIME_SERIES_DAILY";
     private final String COMPANY_OVERVIEW_TOPIC = "COMPANY_OVERVIEW";
 
 
     public AlphaVantageScheduler(KafkaConfig kafkaConfig,
                                  AlphaVantageWebClient alphaVantageWebClient,
-                                 QuoteObjectMapper quoteObjectMapper) {
+                                 QuoteObjectMapper quoteObjectMapper,
+                                 TimeSeriesMapper timeSeriesMapper) {
         this.kafkaConfig = kafkaConfig;
         this.alphaVantageWebClient = alphaVantageWebClient;
         this.quoteObjectMapper = quoteObjectMapper;
+        this.timeSeriesMapper = timeSeriesMapper;
     }
 
-    @Scheduled(fixedRate = 10000)
+    //@Scheduled(fixedRate = 10000)
     public void publishStockPrice() {
 
         alphaVantageWebClient.getStockPrice("AMZN").subscribe(q -> {
@@ -48,7 +54,37 @@ public class AlphaVantageScheduler {
 
             producer.send(quoteRecord);
 
-            log.info("Stock quote: {}", sq);
+            //log.info("Stock quote: {}", sq);
+
+        });
+
+    }
+
+    @Scheduled(fixedRate = 10000)
+    public void publishTimeSeriesStockData() {
+
+        log.info("Calculating time series data for IBM");
+        String quote = "IBM";
+
+        alphaVantageWebClient.getTimeSeriesDailyAdjusted(quote).subscribe(tsda -> {
+
+            tsda.getTimeSeriesDaily().values().stream().limit(5).forEach(tsd -> {
+
+                log.info("Logging time series data: {}", tsd);
+
+                final KafkaProducer<String, TimeSeriesDailyQuote> producer =
+                        new KafkaProducer<>(kafkaConfig.getKafkaConnectionConfig());
+
+                //data model with avro schema.
+                TimeSeriesDailyQuote tsdq =
+                        timeSeriesMapper.timeSeriesDailyToTimeSeriesDailyQuote(tsd);
+
+                ProducerRecord<String, TimeSeriesDailyQuote> quoteRecord =
+                        new ProducerRecord<>(TIME_SERIES_DAILY_TOPIC, quote,tsdq);
+
+                producer.send(quoteRecord);
+
+            });
 
         });
 

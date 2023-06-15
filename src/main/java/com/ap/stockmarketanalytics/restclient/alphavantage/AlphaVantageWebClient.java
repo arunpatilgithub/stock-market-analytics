@@ -3,10 +3,12 @@ package com.ap.stockmarketanalytics.restclient.alphavantage;
 import com.ap.stockmarketanalytics.model.CompanyOverview;
 import com.ap.stockmarketanalytics.model.Quote;
 import com.ap.stockmarketanalytics.model.QuoteResponse;
+import com.ap.stockmarketanalytics.model.timeseries.QuoteTimeSeriesResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -26,6 +28,7 @@ public class AlphaVantageWebClient {
         this.webClient =
                 webClient
                         .baseUrl(ALPHA_VANTAGE_BASE_URL)
+                        .filter(logRequest())
                         .codecs(configurer ->
                                         configurer
                                                 .defaultCodecs()
@@ -60,6 +63,29 @@ public class AlphaVantageWebClient {
                         .build())
                 .retrieve()
                 .bodyToMono(CompanyOverview.class);
+    }
+
+    public Mono<QuoteTimeSeriesResponse> getTimeSeriesDailyAdjusted(String tickerId) {
+
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/query/")
+                        .queryParam("function", "TIME_SERIES_DAILY_ADJUSTED")
+                        .queryParam("symbol", tickerId)
+                        .queryParam("outputsize", "compact")
+                        .queryParam("apikey", apiKey)
+                        .build())
+                .retrieve()
+                .bodyToMono(QuoteTimeSeriesResponse.class);
+
+    }
+
+    private static ExchangeFilterFunction logRequest() {
+        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+            log.info("HTTP Request URL: {}", clientRequest.url());
+            return Mono.just(clientRequest);
+        });
     }
 
 
