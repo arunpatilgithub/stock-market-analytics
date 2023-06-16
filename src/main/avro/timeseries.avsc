@@ -3,13 +3,15 @@
   "name": "TimeSeriesDailyQuote",
   "namespace": "com.ap.stockmarketanalytics.model",
   "fields": [
+    { "name": "symbol", "type": "string" },
     { "name": "open", "type": "double" },
     { "name": "high", "type": "double" },
     { "name": "low", "type": "double" },
     { "name": "close", "type": "double" },
     { "name": "adjustedClose", "type": "double" },
-    { "name": "volume", "type": "int" },
+    { "name": "volume", "type": "long" },
     { "name": "dividendAmount", "type": "double" },
-    { "name": "splitCoefficient", "type": "double" }
+    { "name": "splitCoefficient", "type": "double" },
+    { "name": "closingDate", "type": "string" }
   ]
 }

@@ -3,6 +3,7 @@ package com.ap.stockmarketanalytics.model.timeseries;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class QuoteTimeSeriesResponse {
     public void setTimeSeriesData(Map<String, TimeSeriesDaily> timeSeriesData) {
 
         this.timeSeriesDaily = new TreeMap<>();
+        Duration.ofDays(1);
 
         for (Map.Entry<String, TimeSeriesDaily> entry : timeSeriesData.entrySet()) {
             String dateString = entry.getKey();
