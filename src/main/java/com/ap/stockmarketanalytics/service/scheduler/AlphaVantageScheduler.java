@@ -65,7 +65,7 @@ public class AlphaVantageScheduler {
 
     }
 
-    @Scheduled(fixedRate = 100000)
+    @Scheduled(fixedRate = 15000)
     public void publishTimeSeriesStockData() {
 
         log.info("Calculating time series data for IBM");

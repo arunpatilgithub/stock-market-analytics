@@ -1,14 +1,14 @@
 package com.ap.stockmarketanalytics.consumer;
 
+import com.ap.stockmarketanalytics.model.FiveDaysAverage;
+import com.ap.stockmarketanalytics.model.StockCountSum;
 import com.ap.stockmarketanalytics.model.TimeSeriesDailyQuote;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Printed;
-import org.apache.kafka.streams.kstream.Suppressed;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.kstream.Windowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,30 +29,31 @@ public class TimeSeriesQuoteConsumer {
         KStream<String, TimeSeriesDailyQuote> quoteDailyEvents =
                 builder.stream(TIME_SERIES_DAILY_TOPIC, Consumed.with(new FiveDayTrailingTimeStampExtractor()));
 
+        quoteDailyEvents
+                .print(Printed.<String, TimeSeriesDailyQuote>toSysOut()
+                              .withLabel("Daily quotes for last 5 days"));
+
         //Define time window of 5 days.
         TimeWindows tumblingWindow = TimeWindows.ofSizeWithNoGrace(Duration.ofDays(5));
 
-        KTable<Windowed<String>, Long> fiveDayMovingAverage =
+        //KTable<Windowed<String>, StockCountSum> fiveDayMovingAverage =
                 quoteDailyEvents
-                        // 2
                         .groupByKey()
-                        // 3.1 - windowed aggregation
                         .windowedBy(tumblingWindow)
-                        // 3.2 - windowed aggregation
-                        .count(Materialized.as("five-day-moving-average-view"))
-                        // 4
-                        .suppress(
-                                Suppressed.untilWindowCloses(
-                                        Suppressed.BufferConfig.unbounded().shutDownWhenFull()));
+                        .aggregate(() -> new StockCountSum(0L,0.0), (key, value, aggregate) -> {
+                            aggregate.setCount(aggregate.getCount() + 1);
+                            aggregate.setSum(aggregate.getSum() + value.getClose());
+                            return aggregate;
+                        }).toStream()
+                        .map((Windowed<String> key, StockCountSum stockAverage) -> {
+                            double aveNoFormat = stockAverage.getSum()/(double)stockAverage.getCount();
+                            double formattedAve = Double.parseDouble(String.format("%.4f", aveNoFormat));
 
-        fiveDayMovingAverage.toStream().print(Printed.<Windowed<String>, Long>toSysOut().withLabel("Five day moving " +
-                                                                                                           "average!"));
-//
-//        KStream<String, Long> metrics = builder.stream("five-day-moving-average");
-//        metrics.foreach((k,v) -> {
-//            log.info("Key: {}", k);
-//            log.info("Value: {}", v);
-//        });
+                            FiveDaysAverage fda = new FiveDaysAverage(formattedAve);
+
+                            return new KeyValue<>(key.key(), fda) ;
+                        })
+                        .to("5_days_moving_average");
 
     }
 

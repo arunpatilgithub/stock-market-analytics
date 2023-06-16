@@ -1,0 +1,12 @@
+{
+  "namespace": "com.ap.stockmarketanalytics.model",
+  "type": "record",
+  "name": "FiveDaysAverage",
+  "fields": [
+    {
+      "name": "average",
+      "type": "double"
+    }
+  ]
+
+}
