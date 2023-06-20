@@ -1,0 +1,14 @@
+spring:
+  kafka:
+    bootstrap-servers: http://192.168.4.146:9092
+    schema-registry-url: http://192.168.4.146:8081
+    streams:
+      application-id: stock-market-analytics
+
+stock-market-analytics:
+  alpha-vantage:
+    apiKey: ${ALPHA_VANTAGE_API_KEY}
+
+logging:
+  level:
+    root: info

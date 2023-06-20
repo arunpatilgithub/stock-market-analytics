@@ -1,0 +1,16 @@
+{
+  "namespace": "com.ap.stockmarketanalytics.model",
+  "type": "record",
+  "name": "StockCountSum",
+  "fields": [
+    {
+      "name": "count",
+      "type": "long"
+    },
+    {
+      "name": "sum",
+      "type": "double"
+    }
+  ]
+}
+
