@@ -1,7 +1,7 @@
 spring:
   kafka:
-    bootstrap-servers: http://192.168.4.146:9092
-    schema-registry-url: http://192.168.4.146:8081
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    schema-registry-url: ${SCHEMA_REGISTRY}
     streams:
       application-id: stock-market-analytics
 
@@ -12,3 +12,5 @@ stock-market-analytics:
 logging:
   level:
     root: info
+server:
+  port: 8083
